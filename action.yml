@@ -1,0 +1,35 @@
+name: Parse Server Credentials
+description: A GitHub Action to parse a server string into its components
+
+inputs:
+  SERVER:
+    description: The server string to parse
+    required: true
+
+outputs:
+  USERNAME:
+    description: The username component of the server string
+    value: ${{steps.script.outputs.USERNAME}}
+  HOST:
+    description: The host component of the server string
+    value: ${{steps.script.outputs.HOST}}
+  PORT:
+    description: The port component of the server string
+    value: ${{steps.script.outputs.PORT}}
+
+runs:
+  using: composite
+  steps:
+    - id: script
+      name: Run Script
+      shell: bash
+      run: |
+        SERVER="${{inputs.SERVER}}"
+        if [[ $SERVER =~ ^([^@]+)@([^:]+):([0-9]+)$ ]]; then
+          echo USERNAME="${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          echo HOST="${BASH_REMATCH[2]}" >> $GITHUB_OUTPUT
+          echo PORT="${BASH_REMATCH[3]}" >> $GITHUB_OUTPUT
+        else
+          echo "Error: Invalid SERVER format"
+          exit 1
+        fi

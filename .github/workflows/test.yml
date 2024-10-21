@@ -1,0 +1,31 @@
+name: Test Parse Server Credentials
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Test Valid Input
+        id: test-valid
+        uses: ./
+        with:
+          SERVER: 'user@host.com:22'
+      - name: Verify Valid Input Outputs
+        run: |
+          echo "Testing valid input..."
+          if [ "${{ steps.test-valid.outputs.USERNAME }}" != "user" ]; then
+            echo "Error: USERNAME output does not match expected value."
+            exit 1
+          fi
+          if [ "${{ steps.test-valid.outputs.HOST }}" != "host.com" ]; then
+            echo "Error: HOST output does not match expected value."
+            exit 1
+          fi
+          if [ "${{ steps.test-valid.outputs.PORT }}" != "22" ]; then
+            echo "Error: PORT output does not match expected value."
+            exit 1
+          fi
